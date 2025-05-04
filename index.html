@@ -366,94 +366,128 @@
   </div>
 
   <script>
-    document.getElementById('raffleForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Check if email is required
-      const emailField = document.getElementById('email');
-      const noEmailCheckbox = document.getElementById('noEmail');
-      
-      if (noEmailCheckbox.checked) {
-        emailField.removeAttribute('required');
-        emailField.value = ''; // Clear any entered value
-      } else {
-        emailField.setAttribute('required', '');
-        if (!emailField.value) {
-          alert('Please enter your email address or check the "I don\'t have an email address" box');
-          return;
-        }
-      }
-      
-      // Show loading overlay
-      document.getElementById('loadingOverlay').classList.add('active');
-      
-      // Actual form submission using fetch
-      fetch(this.action, {
-        method: 'POST',
-        body: new FormData(this),
-        mode: 'no-cors' // Important for Google Apps Script
-      })
-      .then(() => {
-        // Hide loading overlay
-        document.getElementById('loadingOverlay').classList.remove('active');
-        
-        // Show success message
-        document.getElementById('successMessage').classList.add('active');
-        
-        // Create confetti
-        createConfetti();
-        
-        // Reset form
-        this.reset();
-        noEmailCheckbox.checked = false; // Reset the checkbox
-      })
-      .catch(error => {
-        document.getElementById('loadingOverlay').classList.remove('active');
-        alert('There was an error submitting your form. Please try again.');
-        console.error('Error:', error);
-      });
-    });
-    
-    // Toggle email field requirement when checkbox changes
-    document.getElementById('noEmail').addEventListener('change', function() {
-      const emailField = document.getElementById('email');
-      if (this.checked) {
-        emailField.removeAttribute('required');
-        emailField.disabled = true;
-        emailField.placeholder = 'Skipped (no email)';
-      } else {
-        emailField.setAttribute('required', '');
-        emailField.disabled = false;
-        emailField.placeholder = '';
-      }
-    });
-    
-    // Back button functionality
-    document.getElementById('backButton').addEventListener('click', function() {
-      document.getElementById('successMessage').classList.remove('active');
-    });
-    
-    // Confetti function
-    function createConfetti() {
-      const colors = ['#2e86de', '#1b4f72', '#feca57', '#ff6b6b', '#5f27cd', '#1dd1a1'];
-      
-      for (let i = 0; i < 100; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.width = Math.random() * 10 + 5 + 'px';
-        confetti.style.height = Math.random() * 10 + 5 + 'px';
-        confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
-        confetti.style.animationDelay = Math.random() * 2 + 's';
-        
-        document.body.appendChild(confetti);
-        
-        setTimeout(() => {
-          confetti.remove();
-        }, 5000);
-      }
+  document.getElementById('raffleForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  // Check if email is required
+  const emailField = document.getElementById('email');
+  const noEmailCheckbox = document.getElementById('noEmail');
+  
+  if (noEmailCheckbox.checked) {
+    emailField.removeAttribute('required');
+    emailField.value = ''; // Clear any entered value
+  } else {
+    emailField.setAttribute('required', '');
+    if (!emailField.value) {
+      alert('Please enter your email address or check the "Skip Email" box');
+      return;
     }
-  </script>
+    
+    // Validate email format if provided
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailField.value)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+  }
+  
+  // Validate phone number format
+  const phoneField = document.getElementById('contact');
+  const phoneRegex = /^[0-9\-\+]{9,15}$/;
+  if (!phoneRegex.test(phoneField.value)) {
+    alert('Please enter a valid phone number');
+    return;
+  }
+  
+  // Show loading overlay
+  document.getElementById('loadingOverlay').classList.add('active');
+  
+  // Actual form submission using fetch
+  fetch(this.action, {
+    method: 'POST',
+    body: new FormData(this),
+    mode: 'no-cors' // Important for Google Apps Script
+  })
+  .then(() => {
+    // Hide loading overlay
+    document.getElementById('loadingOverlay').classList.remove('active');
+    
+    // Show success message
+    document.getElementById('successMessage').classList.add('active');
+    
+    // Create confetti
+    createConfetti();
+    
+    // Reset form
+    this.reset();
+    noEmailCheckbox.checked = false; // Reset the checkbox
+  })
+  .catch(error => {
+    document.getElementById('loadingOverlay').classList.remove('active');
+    alert('There was an error submitting your form. Please try again.');
+    console.error('Error:', error);
+  });
+});
+
+// Toggle email field requirement when checkbox changes
+document.getElementById('noEmail').addEventListener('change', function() {
+  const emailField = document.getElementById('email');
+  if (this.checked) {
+    emailField.removeAttribute('required');
+    emailField.disabled = true;
+    emailField.placeholder = 'Skipped (no email)';
+    emailField.value = '';
+  } else {
+    emailField.setAttribute('required', '');
+    emailField.disabled = false;
+    emailField.placeholder = '';
+  }
+});
+
+// Back button functionality - now refreshes the page
+document.getElementById('backButton').addEventListener('click', function() {
+  document.getElementById('successMessage').classList.remove('active');
+  // Refresh the page after a short delay for better UX
+  setTimeout(() => {
+    window.location.reload();
+  }, 300);
+});
+
+// Improved confetti function with better performance
+function createConfetti() {
+  const colors = ['#2e86de', '#1b4f72', '#feca57', '#ff6b6b', '#5f27cd', '#1dd1a1'];
+  const confettiContainer = document.createElement('div');
+  confettiContainer.style.position = 'fixed';
+  confettiContainer.style.top = '0';
+  confettiContainer.style.left = '0';
+  confettiContainer.style.width = '100%';
+  confettiContainer.style.height = '100%';
+  confettiContainer.style.pointerEvents = 'none';
+  confettiContainer.style.zIndex = '1002';
+  
+  document.body.appendChild(confettiContainer);
+  
+  for (let i = 0; i < 100; i++) {
+    const confetti = document.createElement('div');
+    confetti.className = 'confetti';
+    confetti.style.left = Math.random() * 100 + 'vw';
+    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.width = Math.random() * 10 + 5 + 'px';
+    confetti.style.height = Math.random() * 10 + 5 + 'px';
+    confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+    confetti.style.animationDelay = Math.random() * 2 + 's';
+    
+    confettiContainer.appendChild(confetti);
+    
+    setTimeout(() => {
+      confetti.remove();
+    }, 5000);
+  }
+  
+  // Remove container after animation completes
+  setTimeout(() => {
+    confettiContainer.remove();
+  }, 5000);
+}  </script>
 </body>
 </html>
