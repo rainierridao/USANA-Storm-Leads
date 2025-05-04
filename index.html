@@ -287,7 +287,70 @@
     }
 
 }
+
+
+
+/* Basic modal styling */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 500px;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: black;
+}
         
+        
+        .modal-content input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.modal-content button {
+  width: 100%;
+  padding: 10px;
+  background-color: #2e86de;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #1b4f72;
+}
   </style>
 </head>
 <body>
@@ -324,29 +387,31 @@
       <textarea id="address" name="address" rows="2" required></textarea>
 
       <label for="work">Nature of Work</label>
-      <select id="work" name="work" required style="height: 38px;">
-        <option value="">Select...</option>
-        <option value="Call Center Agent">Call Center Agent</option>
-        <option value="Content Creator">Content Creator</option>
-        <option value="Engineer">Engineer</option>
-        <option value="Entrepreneur">Entrepreneur</option>
-        <option value="Fitness Coach">Fitness Coach</option>
-        <option value="Freelancer">Freelancer</option>
-        <option value="Healthcare Worker">Healthcare Worker</option>
-        <option value="Housewife">Housewife</option>
-        <option value="Marketing">Marketing</option>
-        <option value="OFW">OFW (Overseas Filipino Worker)</option>
-        <option value="Office Worker">Office Worker</option>
-        <option value="Real Estate Agent">Real Estate Agent</option>
-        <option value="Retail Staff">Retail Staff</option>
-        <option value="Retired">Retired</option>
-        <option value="Sales Representative">Sales Representative</option>
-        <option value="Service Crew">Service Crew</option>
-        <option value="Student">Student</option>
-        <option value="Teacher">Teacher</option>
-        <option value="Working Mom">Working Mom</option>
-        <option value="VA">VA</option>
-      </select>
+      <select id="work" name="work" required style="height: 38px;" onchange="checkOtherOption(this)">
+  <option value="">Select...</option>
+  <option value="Call Center Agent">Call Center Agent</option>
+  <option value="Content Creator">Content Creator</option>
+  <option value="Engineer">Engineer</option>
+  <option value="Entrepreneur">Entrepreneur</option>
+  <option value="Fitness Coach">Fitness Coach</option>
+  <option value="Freelancer">Freelancer</option>
+  <option value="Healthcare Worker">Healthcare Worker</option>
+  <option value="Housewife">Housewife</option>
+  <option value="Marketing">Marketing</option>
+  <option value="OFW">OFW (Overseas Filipino Worker)</option>
+  <option value="Office Worker">Office Worker</option>
+  <option value="Real Estate Agent">Real Estate Agent</option>
+  <option value="Retail Staff">Retail Staff</option>
+  <option value="Retired">Retired</option>
+  <option value="Sales Representative">Sales Representative</option>
+  <option value="Service Crew">Service Crew</option>
+  <option value="Student">Student</option>
+  <option value="Teacher">Teacher</option>
+  <option value="Working Mom">Working Mom</option>
+  <option value="VA">VA</option>
+  <option value="Others">Others, Please specify</option>
+</select>
+
 
       <button type="submit">Submit Entry</button>
     </form>
@@ -365,7 +430,63 @@
     <button style="width: 200px;" class="back-button" id="backButton">Back to Form</button>
   </div>
 
+
+
+<!-- The Modal -->
+<div id="otherOccupationModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3>Please specify your occupation</h3>
+    <input type="text" id="otherOccupation" placeholder="Enter your occupation">
+    <button onclick="saveOtherOccupation()">Save</button>
+  </div>
+</div>
+
+
   <script>
+
+
+
+function checkOtherOption(select) {
+  if (select.value === "Others") {
+    document.getElementById("otherOccupationModal").style.display = "block";
+  }
+}
+
+function closeModal() {
+  document.getElementById("otherOccupationModal").style.display = "none";
+  // Removed the line that was resetting the select value
+}
+
+function saveOtherOccupation() {
+  const otherValue = document.getElementById("otherOccupation").value.trim();
+  if (otherValue) {
+    const select = document.getElementById("work");
+    
+    // Check if this value already exists in the options
+    let exists = false;
+    for (let i = 0; i < select.options.length; i++) {
+      if (select.options[i].value === otherValue) {
+        exists = true;
+        break;
+      }
+    }
+    
+    // Only add if it doesn't exist
+      if (!exists) {
+        const newOption = new Option(otherValue, otherValue);
+        select.add(newOption);
+          }
+          
+          // Set the selected value to the new option
+          select.value = otherValue;
+            
+            // Clear the input field for next time
+              document.getElementById("otherOccupation").value = "";
+              }
+              closeModal();
+              }
+
   document.getElementById('raffleForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
