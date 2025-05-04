@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>USANA Storm - Raffle Entry</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #2e86de, #1b4f72);
+      min-height: 100vh;
+      background-image: url('https://vcdn1-english.vnecdn.net/2023/08/31/woman-applying-face-cream-1693-8663-8338-1693499675.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=wmv-QhEUohoN1VdALBeRqQ');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 25px 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      max-width: 460px;
+      width: 90%;
+      transition: all 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e86de;
+      font-size: 30px;
+      margin-bottom: 5px;
+    }
+
+    p.subtext {
+      text-align: center;
+      color: #555;
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #2e86de;
+      box-shadow: 0 0 4px rgba(46, 134, 222, 0.3);
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 10px;
+      background-color: #2e86de;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1b4f72;
+    }
+
+    /* Email field container */
+    .email-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .email-container input[type="email"] {
+      width: 320px; /* gets ignored because flex:1 is still applied */
+    }
+
+    .skip-email {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .skip-email input {
+      width: auto;
+      margin: 0;
+    }
+
+    /* Loading overlay styles */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .loader {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #2e86de;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      display: inline-block;
+      box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Success message styles */
+    .success-message {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .success-message.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      color: #2e86de;
+      margin-bottom: 20px;
+      animation: bounce 0.5s;
+    }
+
+    .success-text {
+      font-size: 22px;
+      color: #2e86de;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .success-subtext {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 25px;
+      max-width: 300px;
+    }
+
+    .back-button {
+      padding: 10px 25px;
+      background-color: #2e86de;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #1b4f72;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-20px);
+      }
+      60% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Confetti styles */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: #f00;
+      opacity: 0;
+      z-index: 1002;
+      animation: confetti-fall 3s ease-in-out forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+  
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <h2>✨ Glow & Win – Raffle ✨</h2>
+    <p class="subtext">Enter now for a chance to win a premium skincare gift!</p>
+    <form id="raffleForm" action="https://script.google.com/macros/s/AKfycbzWznDJ681M3zYOzNHP00Gv-NP3mxjFUhIlE-5XBeHpbRv35vTFkhRakhTih2z0VaGtkQ/exec" method="POST">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required />
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div style="flex: 1;">
+        <label for="bday">Birthday</label>
+          <input type="date" id="bday" name="bday" style="width: 100%;" required />
+          </div>
+          <div style="flex: 1;">
+          <label for="contact">Contact Number</label>
+            <input type="tel" id="contact" name="contact" style="width: 100%;" required />
+            </div>
+            </div>
+            <label for="email">Email Address</label>
+          
+          <div class="email-container">
+          <input type="email" id="email" name="email" />
+          <div class="skip-email">
+          <input type="checkbox" id="noEmail" name="noEmail">
+          <label for="noEmail">Skip Email</label>
+            </div>
+
+          </div>
+
+    
+      <label for="address">Address</label>
+      <textarea id="address" name="address" rows="2" required></textarea>
+
+      <label for="work">Nature of Work</label>
+      <select id="work" name="work" required>
+        <option value="">Select...</option>
+        <option value="Call Center Agent">Call Center Agent</option>
+        <option value="Content Creator">Content Creator</option>
+        <option value="Engineer">Engineer</option>
+        <option value="Entrepreneur">Entrepreneur</option>
+        <option value="Fitness Coach">Fitness Coach</option>
+        <option value="Freelancer">Freelancer</option>
+        <option value="Healthcare Worker">Healthcare Worker</option>
+        <option value="Housewife">Housewife</option>
+        <option value="Marketing">Marketing</option>
+        <option value="OFW">OFW (Overseas Filipino Worker)</option>
+        <option value="Office Worker">Office Worker</option>
+        <option value="Real Estate Agent">Real Estate Agent</option>
+        <option value="Retail Staff">Retail Staff</option>
+        <option value="Retired">Retired</option>
+        <option value="Sales Representative">Sales Representative</option>
+        <option value="Service Crew">Service Crew</option>
+        <option value="Student">Student</option>
+        <option value="Teacher">Teacher</option>
+        <option value="Working Mom">Working Mom</option>
+        <option value="VA">VA</option>
+      </select>
+
+      <button type="submit">Submit Entry</button>
+    </form>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Success message -->
+  <div class="success-message" id="successMessage">
+    <div class="success-icon">🎉</div>
+    <div class="success-text">Entry Submitted!</div>
+    <div class="success-subtext">Thank you for participating in our raffle. Good luck!</div>
+    <button style="width: 200px;" class="back-button" id="backButton">Back to Form</button>
+  </div>
+
+  <script>
+    document.getElementById('raffleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Check if email is required
+      const emailField = document.getElementById('email');
+      const noEmailCheckbox = document.getElementById('noEmail');
+      
+      if (noEmailCheckbox.checked) {
+        emailField.removeAttribute('required');
+        emailField.value = ''; // Clear any entered value
+      } else {
+        emailField.setAttribute('required', '');
+        if (!emailField.value) {
+          alert('Please enter your email address or check the "I don\'t have an email address" box');
+          return;
+        }
+      }
+      
+      // Show loading overlay
+      document.getElementById('loadingOverlay').classList.add('active');
+      
+      // Actual form submission using fetch
+      fetch(this.action, {
+        method: 'POST',
+        body: new FormData(this),
+        mode: 'no-cors' // Important for Google Apps Script
+      })
+      .then(() => {
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').classList.remove('active');
+        
+        // Show success message
+        document.getElementById('successMessage').classList.add('active');
+        
+        // Create confetti
+        createConfetti();
+        
+        // Reset form
+        this.reset();
+        noEmailCheckbox.checked = false; // Reset the checkbox
+      })
+      .catch(error => {
+        document.getElementById('loadingOverlay').classList.remove('active');
+        alert('There was an error submitting your form. Please try again.');
+        console.error('Error:', error);
+      });
+    });
+    
+    // Toggle email field requirement when checkbox changes
+    document.getElementById('noEmail').addEventListener('change', function() {
+      const emailField = document.getElementById('email');
+      if (this.checked) {
+        emailField.removeAttribute('required');
+        emailField.disabled = true;
+        emailField.placeholder = 'Skipped (no email)';
+      } else {
+        emailField.setAttribute('required', '');
+        emailField.disabled = false;
+        emailField.placeholder = '';
+      }
+    });
+    
+    // Back button functionality
+    document.getElementById('backButton').addEventListener('click', function() {
+      document.getElementById('successMessage').classList.remove('active');
+    });
+    
+    // Confetti function
+    function createConfetti() {
+      const colors = ['#2e86de', '#1b4f72', '#feca57', '#ff6b6b', '#5f27cd', '#1dd1a1'];
+      
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+    }
+  </script>
+</body>
+</html>
