@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>USANA Storm - Select Event</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --dark: #1a1a2e;
+      --light: #f8f9fa;
+      --success: #4cc9f0;
+      --error: #f72585;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 100%;
+      max-width: 480px;
+      transform: translateY(0);
+      transition: var(--transition);
+    }
+    
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+    
+    h1, h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    
+    h1 {
+      font-size: 28px;
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-top: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 14px;
+    }
+    
+    select, input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--border-radius);
+      border: 1px solid #e0e0e0;
+      font-size: 15px;
+      transition: var(--transition);
+      background-color: #f8f9fa;
+    }
+    
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+      background-color: white;
+    }
+    
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--border-radius);
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 8px;
+      position: relative;
+    }
+    
+    #submitBtn, #createEventBtn {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    #submitBtn:hover, #createEventBtn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .toggle-create {
+      text-align: center;
+      margin: 20px 0 10px;
+      color: var(--primary);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+    
+    .toggle-create:hover {
+      text-decoration: underline;
+    }
+    
+    .message {
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .error {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--error);
+    }
+    
+    .success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: var(--success);
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(26, 26, 46, 0.8);
+      backdrop-filter: blur(4px);
+      overflow: auto;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.show {
+      opacity: 1;
+    }
+    
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 32px;
+      border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--box-shadow);
+      transform: translateY(-20px);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: -10px;
+      margin-right: -10px;
+    }
+    
+    .close:hover {
+      color: var(--error);
+    }
+    
+    /* Loading animations */
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+    
+    .loading {
+      animation: pulse 1.5s infinite;
+      text-align: center;
+      color: var(--primary);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .button-loading {
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    
+    .button-loading::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+      border: 3px solid transparent;
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    /* Modern select arrow */
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>USANA Storm ⚡</h1>
+    <p class="loading" id="loadingIndicator">Loading events...</p>
+
+    <div id="selectEventForm" style="display: none;">
+      <form id="accessEventForm">
+        <div class="form-group">
+          <label for="eventSelect">Event Title</label>
+          <select id="eventSelect">
+            <option value="">Select an event</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="eventPassword">Event Password</label>
+          <input type="password" id="eventPassword" placeholder="Enter event password">
+        </div>
+        <button type="submit" id="submitBtn">Access Event</button>
+        <div class="toggle-create" id="toggleCreate">
+          <span>+</span> Create New Event
+        </div>
+        <div id="errorMsg" class="message"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Event Modal -->
+  <div id="createEventModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Create New Event</h2>
+      <form id="createEventForm">
+        <div class="form-group">
+          <label for="newEventTitle">Event Title</label>
+          <input type="text" id="newEventTitle" placeholder="Enter event name">
+        </div>
+        <div class="form-group">
+          <label for="newEventPassword">Create Password</label>
+          <input type="password" id="newEventPassword" placeholder="Create event password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm password">
+        </div>
+        <button type="submit" id="createEventBtn">Create Event</button>
+        <div id="createEventMsg" class="message"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Replace with your Google Apps Script web app URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWznDJ681M3zYOzNHP00Gv-NP3mxjFUhIlE-5XBeHpbRv35vTFkhRakhTih2z0VaGtkQ/exec';
+    
+    // Helper function to generate a salt
+    async function generateSalt() {
+      const array = new Uint8Array(16);
+      window.crypto.getRandomValues(array);
+      return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // Helper function to hash password with salt
+    async function hashPassword(password, salt) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password + salt);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // Helper function to show loading state on buttons
+    function setLoading(button, isLoading) {
+      if (isLoading) {
+        button.classList.add('button-loading');
+        button.disabled = true;
+      } else {
+        button.classList.remove('button-loading');
+        button.disabled = false;
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load events from Google Sheet
+      loadEvents();
+      
+      // Modal functionality
+      const modal = document.getElementById('createEventModal');
+      const toggleBtn = document.getElementById('toggleCreate');
+      const closeBtn = document.querySelector('.close');
+      
+      toggleBtn.addEventListener('click', function() {
+        modal.style.display = 'block';
+        setTimeout(() => {
+          modal.classList.add('show');
+        }, 10);
+      });
+      
+      closeBtn.addEventListener('click', function() {
+        modal.classList.remove('show');
+        setTimeout(() => {
+          modal.style.display = 'none';
+          document.getElementById('createEventMsg').textContent = '';
+        }, 300);
+      });
+      
+      window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.classList.remove('show');
+          setTimeout(() => {
+            modal.style.display = 'none';
+            document.getElementById('createEventMsg').textContent = '';
+          }, 300);
+        }
+      });
+      
+      // Form submission handling
+      document.getElementById('accessEventForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const eventSelect = document.getElementById('eventSelect');
+        const password = document.getElementById('eventPassword').value;
+        const errorMsg = document.getElementById('errorMsg');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (!eventSelect.value) {
+          showError(errorMsg, 'Please select an event');
+          return;
+        }
+        
+        if (!password) {
+          showError(errorMsg, 'Please enter the event password');
+          return;
+        }
+        
+        // Set loading state
+        setLoading(submitBtn, true);
+        
+        try {
+          // Verify event access
+          await verifyEvent(eventSelect.options[eventSelect.selectedIndex].text, password, errorMsg);
+        } catch (error) {
+          console.error('Error:', error);
+          showError(errorMsg, 'An error occurred during verification');
+        } finally {
+          setLoading(submitBtn, false);
+        }
+      });
+      
+      document.getElementById('createEventForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const title = document.getElementById('newEventTitle').value;
+        const password = document.getElementById('newEventPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
+        const msg = document.getElementById('createEventMsg');
+        const createBtn = document.getElementById('createEventBtn');
+        
+        if (!title) {
+          showError(msg, 'Please enter an event title');
+          return;
+        }
+        
+        if (!password) {
+          showError(msg, 'Please create a password');
+          return;
+        }
+        
+        if (password !== confirmPass) {
+          showError(msg, 'Passwords do not match');
+          return;
+        }
+        
+        // Set loading state
+        setLoading(createBtn, true);
+        
+        try {
+          // Generate salt and hash password
+          const salt = await generateSalt();
+          const hashedPassword = await hashPassword(password, salt);
+          const encryptedPassword = `${salt}$${hashedPassword}`;
+          
+          // Create new event with encrypted password
+          await createEvent(title, encryptedPassword, msg);
+        } catch (error) {
+          showError(msg, 'Error securing password');
+          console.error('Encryption error:', error);
+        } finally {
+          setLoading(createBtn, false);
+        }
+      });
+    });
+    
+    function loadEvents() {
+      // Show initial loading state
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      loadingIndicator.textContent = 'Loading events...';
+      loadingIndicator.style.display = 'block';
+      
+      fetch(`${SCRIPT_URL}?action=getEvents`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            const eventSelect = document.getElementById('eventSelect');
+            
+            // Clear existing options except the first one
+            while (eventSelect.options.length > 1) {
+              eventSelect.remove(1);
+            }
+            
+            // Add events from Google Sheet
+            data.data.forEach(event => {
+              const option = document.createElement('option');
+              option.value = event.title; // Using title as value for simplicity
+              option.textContent = event.title;
+              eventSelect.appendChild(option);
+            });
+            
+            loadingIndicator.style.display = 'none';
+            document.getElementById('selectEventForm').style.display = 'block';
+          } else {
+            showError(document.getElementById('errorMsg'), data.message || 'Failed to load events');
+            loadingIndicator.textContent = 'Error loading events';
+          }
+        })
+        .catch(error => {
+          showError(document.getElementById('errorMsg'), 'Failed to connect to server');
+          loadingIndicator.textContent = 'Connection error';
+        });
+    }
+    
+    async function createEvent(title, encryptedPassword, msgElement) {
+      const params = new URLSearchParams();
+      params.append('action', 'createEvent');
+      params.append('title', title);
+      params.append('password', encryptedPassword);
+      
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: params
+        });
+        const data = await response.json();
+        
+        if (data.status === "success") {
+          showSuccess(msgElement, data.message || 'Event created successfully!');
+          
+          // Add to select dropdown
+          const eventSelect = document.getElementById('eventSelect');
+          const option = document.createElement('option');
+          option.value = title;
+          option.textContent = title;
+          eventSelect.appendChild(option);
+          eventSelect.value = option.value;
+          
+          // Clear form
+          document.getElementById('newEventTitle').value = '';
+          document.getElementById('newEventPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+          
+          // Close modal after delay
+          setTimeout(() => {
+            document.getElementById('createEventModal').classList.remove('show');
+            setTimeout(() => {
+              document.getElementById('createEventModal').style.display = 'none';
+            }, 300);
+          }, 1500);
+        } else {
+          showError(msgElement, data.message || 'Failed to create event');
+        }
+      } catch (error) {
+        showError(msgElement, 'Failed to connect to server');
+        throw error;
+      }
+    }
+    
+    async function verifyEvent(title, password, msgElement) {
+      // First get the stored salt and hash
+      const paramsGet = new URLSearchParams();
+      paramsGet.append('action', 'getEvent');
+      paramsGet.append('title', title);
+      
+      try {
+        const response = await fetch(`${SCRIPT_URL}?${paramsGet.toString()}`);
+        const data = await response.json();
+        
+        if (data.status === "success") {
+          const [salt, storedHash] = data.password.split('$');
+          const hashedPassword = await hashPassword(password, salt);
+          
+          // Now verify the password
+          const verifyParams = new URLSearchParams();
+          verifyParams.append('action', 'verifyEvent');
+          verifyParams.append('title', title);
+          verifyParams.append('password', `${salt}$${hashedPassword}`);
+          
+          const verifyResponse = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: verifyParams
+          });
+          const verifyData = await verifyResponse.json();
+          
+          if (verifyData.status === "success") {
+            showSuccess(msgElement, verifyData.message || 'Access granted! Redirecting...');
+            // Store the event title in sessionStorage
+            sessionStorage.setItem('currentEvent', title);
+            // Redirect to index.html after 1.5 seconds
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 1500);
+          } else {
+            showError(msgElement, verifyData.message || 'Access denied');
+          }
+        } else {
+          showError(msgElement, data.message || 'Event not found');
+        }
+      } catch (error) {
+        showError(msgElement, 'Failed to verify event');
+        console.error('Verification error:', error);
+        throw error;
+      }
+    }
+    
+    function showError(element, message) {
+      element.textContent = message;
+      element.className = 'message error';
+    }
+    
+    function showSuccess(element, message) {
+      element.textContent = message;
+      element.className = 'message success';
+    }
+  </script>
+</body>
+</html>
