@@ -315,15 +315,21 @@
         
         #tableContainer {
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
         width: 100%;
-        display: block;
+        margin-bottom: 20px;
+        -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
       }
       
+
       table {
-        width: auto;
-        min-width: 100%;
-        display: block;
+        width: 100%;
+        min-width: 800px; /* Ensures table has a minimum width */
+        border-collapse: collapse;
+        margin-top: 20px;
+        box-shadow: var(--box-shadow);
+        background-color: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
       }
       
       th, td {
