@@ -561,61 +561,70 @@
         });
     }
     
-    function renderTable() {
-      const tableBody = document.getElementById('leadsTableBody');
-      tableBody.innerHTML = '';
-      
-      if (leadsData.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="9" style="text-align: center;">No data available</td>
-          </tr>
-        `;
-        document.getElementById('pagination').innerHTML = '';
-        return;
-      }
-      
-    const sortedLeads = [...leadsData].sort((a, b) => {
-  if (a.group === "-" && b.group === "-") return 0;
-  if (a.group === "-") return 1;
-  if (b.group === "-") return -1;
-  return a.group - b.group;
-}).reverse();
-      
-      const startIndex = (currentPage - 1) * rowsPerPage;
-      const endIndex = Math.min(startIndex + rowsPerPage, sortedLeads.length);
-      const paginatedData = sortedLeads.slice(startIndex, endIndex);
-      
-      let currentGroup = null;
-      
-      paginatedData.forEach(lead => {
-        // Group header logic
-        if (lead.group && lead.group !== "-" && lead.group !== currentGroup) {
-          currentGroup = lead.group;
-          const groupRow = document.createElement('tr');
-          groupRow.className = 'group-header';
-          groupRow.innerHTML = `<td colspan="9">Group ${currentGroup}</td>`;
-          tableBody.appendChild(groupRow);
-        }
-        
-        // Regular row
-        const row = document.createElement('tr');
-        row.innerHTML = `
-
-          <td>${lead.name}</td>
-          <td style="display:none;">${lead.bday}</td>
-          <td>${lead.age}</td>
-          <td>${lead.contact}</td>
-          <td>${lead.email}</td>
-          <td>${lead.address}</td>
-          <td>${lead.work}</td>
-          <td>${lead.group}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-      
-      renderPagination();
+  function renderTable() {
+  const tableBody = document.getElementById('leadsTableBody');
+  tableBody.innerHTML = '';
+  
+  if (leadsData.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="9" style="text-align: center;">No data available</td>
+      </tr>
+    `;
+    document.getElementById('pagination').innerHTML = '';
+    return;
+  }
+  
+  // Check if any lead has a valid group (not "-")
+  const hasGroups = leadsData.some(lead => lead.group && lead.group !== "-");
+  
+  let sortedLeads;
+  if (hasGroups) {
+    // Sort with Group 1 first, then Group 2, etc., with ungrouped ("-") at bottom
+    sortedLeads = [...leadsData].sort((a, b) => {
+      if (a.group === "-" && b.group === "-") return 0;
+      if (a.group === "-") return 1;      // Move ungrouped to bottom
+      if (b.group === "-") return -1;     // Move ungrouped to bottom
+      return a.group - b.group;          // Sort groups numerically (1, 2, 3...)
+    });
+  } else {
+    // When no groups exist, sort by newest first (reverse original array)
+    sortedLeads = [...leadsData].reverse();
+  }
+  
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, sortedLeads.length);
+  const paginatedData = sortedLeads.slice(startIndex, endIndex);
+  
+  let currentGroup = null;
+  
+  paginatedData.forEach(lead => {
+    // Group header logic
+    if (lead.group && lead.group !== "-" && lead.group !== currentGroup) {
+      currentGroup = lead.group;
+      const groupRow = document.createElement('tr');
+      groupRow.className = 'group-header';
+      groupRow.innerHTML = `<td colspan="9">Group ${currentGroup}</td>`;
+      tableBody.appendChild(groupRow);
     }
+    
+    // Regular row
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${lead.name}</td>
+      <td style="display:none;">${lead.bday}</td>
+      <td>${lead.age}</td>
+      <td>${lead.contact}</td>
+      <td>${lead.email}</td>
+      <td>${lead.address}</td>
+      <td>${lead.work}</td>
+      <td>${lead.group}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+  
+  renderPagination();
+}
     
     function renderPagination() {
       const paginationDiv = document.getElementById('pagination');
