@@ -88,11 +88,23 @@
         margin: 0;
         font-weight: 500;
         white-space: nowrap;
+        display: flex;
+        align-items: center;
       }
       
       #eventTitle {
       color: var(--primary);
       font-weight: 600;
+      }
+      
+      #leadCount {
+        font-size: 14px;
+        color: var(--dark);
+        background-color: rgba(67, 97, 238, 0.1);
+        padding: 4px 8px;
+        border-radius: 20px;
+        margin-left: 8px;
+        font-weight: 500;
       }
       
       .nav-buttons {
@@ -317,13 +329,12 @@
         overflow-x: auto;
         width: 100%;
         margin-bottom: 20px;
-        -webkit-overflow-scrolling: touch; /* For smooth scrolling on iOS */
+        -webkit-overflow-scrolling: touch;
       }
       
-
       table {
         width: 100%;
-        min-width: 800px; /* Ensures table has a minimum width */
+        min-width: 800px;
         border-collapse: collapse;
         margin-top: 20px;
         box-shadow: var(--box-shadow);
@@ -366,7 +377,7 @@
       <div class="header-left">
 
       <div class="event-title-container">
-      <h2 id="currentEventDisplay">Current Event: <span id="eventTitle">Loading...</span></h2>
+      <h2 id="currentEventDisplay">Current Event: <span id="eventTitle">Loading...</span> <span id="leadCount"></span></h2>
       </div>
       </div>
       
@@ -446,11 +457,7 @@
         
         // Get and display current event
         const currentEvent = getCurrentEvent();
-        const displayedEvent = document.getElementById('eventTitle').textContent = currentEvent;
-        
-        // Log both the current event and what's being displayed
-        console.log("Current event used for filtering:", currentEvent);
-        console.log("Displayed event title:", displayedEvent);
+        document.getElementById('eventTitle').textContent = currentEvent;
         
         const response = await fetch(webAppUrl);
         
@@ -465,16 +472,11 @@
           throw new Error("Invalid data format received from server");
         }
         
-        // Log all unique event names from the raw data for comparison
-        const allEventsInData = [...new Set(rawData.map(item => item.Events))];
-        console.log("All event names found in data:", allEventsInData);
-        
-        // Transform and filter data to match current event
+        // Filter and transform data
         leadsData = rawData
           .filter(item => {
             const itemEvent = item.Event ? item.Event.trim().toLowerCase() : '';
             const searchEvent = currentEvent.trim().toLowerCase();
-            console.log(`Comparing: "${itemEvent}" with "${searchEvent}"`);
             return itemEvent === searchEvent;
           })
           .map(item => ({
@@ -492,9 +494,11 @@
 
         console.log("Filtered leads data:", leadsData);
         
+        // Update the lead count display
+        updateLeadCount();
+        
         if (leadsData.length === 0) {
           console.warn("No matching data found for event:", currentEvent);
-          console.warn("All event names available:", allEventsInData);
           showError(`No leads found for event: ${currentEvent}`);
           return;
         }
@@ -506,6 +510,12 @@
       } finally {
         showLoading(false);
       }
+    }
+
+    // Function to update the lead counter
+    function updateLeadCount() {
+      const countElement = document.getElementById('leadCount');
+      countElement.textContent = `${leadsData.length} leads`;
     }
     
     function showLoading(show) {
@@ -562,68 +572,71 @@
     }
     
   function renderTable() {
-  const tableBody = document.getElementById('leadsTableBody');
-  tableBody.innerHTML = '';
-  
-  if (leadsData.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="9" style="text-align: center;">No data available</td>
-      </tr>
-    `;
-    document.getElementById('pagination').innerHTML = '';
-    return;
-  }
-  
-  // Check if any lead has a valid group (not "-")
-  const hasGroups = leadsData.some(lead => lead.group && lead.group !== "-");
-  
-  let sortedLeads;
-  if (hasGroups) {
-    // Sort with Group 1 first, then Group 2, etc., with ungrouped ("-") at bottom
-    sortedLeads = [...leadsData].sort((a, b) => {
-      if (a.group === "-" && b.group === "-") return 0;
-      if (a.group === "-") return 1;      // Move ungrouped to bottom
-      if (b.group === "-") return -1;     // Move ungrouped to bottom
-      return a.group - b.group;          // Sort groups numerically (1, 2, 3...)
-    });
-  } else {
-    // When no groups exist, sort by newest first (reverse original array)
-    sortedLeads = [...leadsData].reverse();
-  }
-  
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = Math.min(startIndex + rowsPerPage, sortedLeads.length);
-  const paginatedData = sortedLeads.slice(startIndex, endIndex);
-  
-  let currentGroup = null;
-  
-  paginatedData.forEach(lead => {
-    // Group header logic
-    if (lead.group && lead.group !== "-" && lead.group !== currentGroup) {
-      currentGroup = lead.group;
-      const groupRow = document.createElement('tr');
-      groupRow.className = 'group-header';
-      groupRow.innerHTML = `<td colspan="9">Group ${currentGroup}</td>`;
-      tableBody.appendChild(groupRow);
-    }
+    // Update the lead count whenever we render the table
+    updateLeadCount();
     
-    // Regular row
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${lead.name}</td>
-      <td style="display:none;">${lead.bday}</td>
-      <td>${lead.age}</td>
-      <td>${lead.contact}</td>
-      <td>${lead.email}</td>
-      <td>${lead.address}</td>
-      <td>${lead.work}</td>
-      <td>${lead.group}</td>
-    `;
-    tableBody.appendChild(row);
-  });
+    const tableBody = document.getElementById('leadsTableBody');
+    tableBody.innerHTML = '';
   
-  renderPagination();
+    if (leadsData.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" style="text-align: center;">No data available</td>
+        </tr>
+      `;
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+  
+    // Check if any lead has a valid group (not "-")
+    const hasGroups = leadsData.some(lead => lead.group && lead.group !== "-");
+  
+    let sortedLeads;
+    if (hasGroups) {
+      // Sort with Group 1 first, then Group 2, etc., with ungrouped ("-") at bottom
+      sortedLeads = [...leadsData].sort((a, b) => {
+        if (a.group === "-" && b.group === "-") return 0;
+        if (a.group === "-") return 1;      // Move ungrouped to bottom
+        if (b.group === "-") return -1;     // Move ungrouped to bottom
+        return a.group - b.group;          // Sort groups numerically (1, 2, 3...)
+      });
+    } else {
+      // When no groups exist, sort by newest first (reverse original array)
+      sortedLeads = [...leadsData].reverse();
+    }
+  
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = Math.min(startIndex + rowsPerPage, sortedLeads.length);
+    const paginatedData = sortedLeads.slice(startIndex, endIndex);
+  
+    let currentGroup = null;
+  
+    paginatedData.forEach(lead => {
+      // Group header logic
+      if (lead.group && lead.group !== "-" && lead.group !== currentGroup) {
+        currentGroup = lead.group;
+        const groupRow = document.createElement('tr');
+        groupRow.className = 'group-header';
+        groupRow.innerHTML = `<td colspan="9">Group ${currentGroup}</td>`;
+        tableBody.appendChild(groupRow);
+      }
+      
+      // Regular row
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${lead.name}</td>
+        <td style="display:none;">${lead.bday}</td>
+        <td>${lead.age}</td>
+        <td>${lead.contact}</td>
+        <td>${lead.email}</td>
+        <td>${lead.address}</td>
+        <td>${lead.work}</td>
+        <td>${lead.group}</td>
+      `;
+      tableBody.appendChild(row);
+    });
+  
+    renderPagination();
 }
     
     function renderPagination() {
