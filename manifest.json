@@ -1,0 +1,21 @@
+{
+    "short_name": "UStormLeads",
+    "name": "USANA Storm Leads",
+    "description": "USANA Storm Leads is a web-based tool that helps USANA associates gather leads during the USANA Storm activity.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#003366",
+    "icons": [
+        {
+            "src": "icons/storm_192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/storm_512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
