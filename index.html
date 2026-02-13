@@ -56,19 +56,26 @@
     }
     
     /* Adjust body padding */
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom right, #2e86de, #1b4f72);
-      min-height: 100vh;
-      background-image: url('https://drive.google.com/uc?export=view&id=14nF618Ycqe_RmWetEBb801W_pUS1hcm3');
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+   body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  
+  /* 1. Set a solid backup color */
+  background-color: #1b4f72; 
+  
+  /* 2. Set the image */
+  background-image: url('https://drive.google.com/uc?export=view&id=14nF618Ycqe_RmWetEBb801W_pUS1hcm3');
+  
+  /* 3. Settings */
+  background-size: cover;
+  background-position: center;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
     
     /* Form container */
     .overlay {
