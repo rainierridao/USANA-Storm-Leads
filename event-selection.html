@@ -448,7 +448,7 @@
       });
     });
     
-    function loadEvents() {
+   function loadEvents() {
       // Show initial loading state
       const loadingIndicator = document.getElementById('loadingIndicator');
       loadingIndicator.textContent = 'Loading events...';
@@ -465,6 +465,10 @@
               eventSelect.remove(1);
             }
             
+            // --- NEW: Sort events alphabetically by title ---
+            data.data.sort((a, b) => a.title.localeCompare(b.title));
+            // ------------------------------------------------
+
             // Add events from Google Sheet
             data.data.forEach(event => {
               const option = document.createElement('option');
@@ -485,6 +489,7 @@
           loadingIndicator.textContent = 'Connection error';
         });
     }
+    
     
     async function createEvent(title, encryptedPassword, msgElement) {
       const params = new URLSearchParams();
