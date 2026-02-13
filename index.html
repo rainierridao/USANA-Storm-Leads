@@ -56,22 +56,12 @@
     }
     
     /* Adjust body padding */
-  body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  min-height: 100vh;
-
-  background-color: #1b4f72;
-
-  background-image: url('https://i.ibb.co/7Yw0p5R/Celavive-New2.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+ body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('https://i.ibb.co/Kjt9k4Vk/Celavive-New2.jpg') center/cover no-repeat;
+  z-index: -1;
 }
     
     /* Form container */
